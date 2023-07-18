@@ -12,20 +12,32 @@ import retrofit2.Callback
 import retrofit2.Response
 import kotlin.concurrent.thread
 
+//这里的是我们采用的是ViewModel来存储数据的
+//优点是可以观察数据的变化进而对UI进行改变
 class GalleryViewModel(application: Application) : AndroidViewModel(application) {
+
+    //各个变量对象
     private val TAG:String="zxr"
+    //图片网络请求的标签
     private val keyWords = arrayOf("cat","dog","car","beauty","phone","computer","flower","animal")
+    //使用单例方式创建的Retrofit对象
     private val service=getInstance()!!. create(defaultRequest::class.java)
+    //内部对象存放的数据，不可被外部访问，但可以在内部进行修改
     private var _photoListLiveData=MutableLiveData<List<Photo>>()
+    //对外开放的数据，只能被外部访问，不能被外部修改
     val photoListLiveData:LiveData<List<Photo>>
         get() =_photoListLiveData
     //这样写的好处是我们不能对photoListLiveData进行赋值，只能重新进行读取
 
+
+    //其一次启动app的首页加载
     init {
         Log.d(TAG, "GalleryViewModel Constructor '_photoListLiveData' is : ${_photoListLiveData.value}")
+        //如果没有数据就进行网络请求
         if (_photoListLiveData.value==null){
             thread {
                 Log.d(TAG, "GalleryViewModel Constructor is going ")
+                //从上面随机选取标签进行网络请求
                 service.getPicture(keyWords.random(),100).enqueue(object :Callback<Pixabay>{
                     override fun onResponse(call: Call<Pixabay>, response: Response<Pixabay>) {
                         if (response.body()==null){
@@ -49,9 +61,11 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    //当用户主动刷新图片
     fun refreshPhoto(){
         Log.d(TAG, "refreshPhoto: refresh is going")
         thread {
+            //操作内容基本同上
             service.getPicture(keyWords.random(),100).enqueue(object :Callback<Pixabay>{
                 override fun onResponse(call: Call<Pixabay>, response: Response<Pixabay>) {
                     if (response.body()==null){

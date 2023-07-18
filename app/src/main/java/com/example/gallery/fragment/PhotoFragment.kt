@@ -28,13 +28,14 @@ private const val ARG_PARAM2 = "param2"
  * Use the [PhotoFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
+//这个fragment的则主要采用了PhotoView控件来对图片进行详细的展示
 class PhotoFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
     private val TAG:String="zxr"
 
-
+    //主要用到的两个控件
     private lateinit var shimmerLayoutPhoto: ShimmerLayout
     private lateinit var photoView: PhotoView
 
@@ -54,16 +55,20 @@ class PhotoFragment : Fragment() {
         // Inflate the layout for this fragment
         var view= inflater.inflate(R.layout.fragment_photo, container, false)
 
+        //先从之前的fragment当中取出传来的数据url
         val url=arguments?.getString("largeImageURL")
         Log.d(TAG, "PhotoFragment onCreateView: $url")
 
+        //为我们的控件创建实例
         photoView=view.findViewById(R.id.photoView)
         shimmerLayoutPhoto=view.findViewById<ShimmerLayout?>(R.id.shimmerlLayoutPhoto).apply {
             setShimmerColor(0x55FFFFFF)
-            setShimmerAngle(0)
+            setShimmerAngle(45)
             startShimmerAnimation()
         }
 
+        //shimmerLayout和Glide图片加载的使用与适配器当中写的差不多
+        //有一个值得注意的点就是我们使用Glide最后into到的控件是PhotoView而不是写适配器时的imageview
         Glide.with(requireContext())
             .load(url)
             .placeholder(R.drawable.ic_grayphoto_24)
@@ -88,8 +93,6 @@ class PhotoFragment : Fragment() {
                 }
             })
             .into(photoView)
-
-
 
         return view
     }

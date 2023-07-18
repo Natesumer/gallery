@@ -3,7 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/swipIndicator"
+        android:id="@+id/search_button"
+        android:icon="@drawable/ic_baseline_search_24"
+        app:showAsAction="always"
+        android:title="search you want"
+        />
+    <item
+        android:id="@+id/refresh_button"
         android:icon="@drawable/ic_baseline_refresh_24"
         android:title="swipe to refresh"
         app:showAsAction="always" />
