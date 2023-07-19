@@ -1,11 +1,16 @@
 package com.example.gallery.fragment
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.gallery.R
+import com.example.gallery.modul.SearchViewModel
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -21,6 +26,10 @@ class ResultFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private val TAG:String="zxr"
+
+    private lateinit var searchViewModel: SearchViewModel
+    private lateinit var recyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,8 +44,25 @@ class ResultFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_result, container, false)
+        searchViewModel= ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory(requireActivity().application))[SearchViewModel::class.java]
+
+        //得到搜索的关键字
+        val query=arguments?.getString("key")
+        Log.d(TAG, "ResultFragment onCreateView: the key is $query")
+        val view=inflater.inflate(R.layout.fragment_result, container, false)
+        recyclerView=view.findViewById(R.id.result_recyclerView)
+
+        val layoutManager= StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        recyclerView.layoutManager=layoutManager
+        searchViewModel.searchPhoto(query!!)
+        searchViewModel.resultList.observe(viewLifecycleOwner){
+            //进行搜索操作
+            Log.d(TAG, "ResultFragment onCreateView: result is start query")
+            recyclerView.adapter=SearchAdapter(searchViewModel.resultList.value!!)
+        }
+        return view
     }
+
 
     companion object {
         /**

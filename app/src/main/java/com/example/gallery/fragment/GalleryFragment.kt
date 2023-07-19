@@ -1,5 +1,6 @@
 package com.example.gallery.fragment
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -50,6 +51,7 @@ class GalleryFragment : Fragment() {
         }
     }
 
+    @SuppressLint("ResourceAsColor")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -60,7 +62,9 @@ class GalleryFragment : Fragment() {
         galleryViewModel= ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory(requireActivity().application))[GalleryViewModel::class.java]
 
         //SwipeRefreshLayout的实例创建
-        swipeRefresh=view.findViewById(R.id.swipeLayoutGallery)
+        swipeRefresh=view.findViewById<SwipeRefreshLayout?>(R.id.swipeLayoutGallery).apply {
+            setColorSchemeColors(R.color.purple_700)
+        }
         //recyclerView的相关配置
         recyclerView=view.findViewById(R.id.recyclerView)
         val layoutManager=StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL)

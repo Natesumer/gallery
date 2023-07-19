@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView.OnItemClickListener
 import android.widget.ImageView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -20,7 +19,8 @@ import io.supercharge.shimmerlayout.ShimmerLayout
 
 //这是recyclerView的适配器
 //里面内容比较多，包含：占位控件shimmerLayout、Glide图片加载、fragment的导航及数据传递
-class GalleryAdapter(private val photoList:List<Photo>) :RecyclerView.Adapter<GalleryAdapter.ViewHolder>(){
+class GalleryAdapter(private val photoList:List<Photo>) :
+    RecyclerView.Adapter<GalleryAdapter.ViewHolder>(){
 
     //这里有一个成员变量在构造方法当中用作为recyclerView的数据源头
     //定义一个内部类，用来存放每个cell中的控件
@@ -99,6 +99,6 @@ class GalleryAdapter(private val photoList:List<Photo>) :RecyclerView.Adapter<Ga
         }
     }
 
-    override fun getItemCount(): Int =photoList.size
+    override fun getItemCount()=photoList.size
 
 }

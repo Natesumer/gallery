@@ -11,6 +11,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import kotlin.concurrent.thread
+import kotlin.random.Random
 
 //这里的是我们采用的是ViewModel来存储数据的
 //优点是可以观察数据的变化进而对UI进行改变
@@ -19,7 +20,12 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     //各个变量对象
     private val TAG:String="zxr"
     //图片网络请求的标签
-    private val keyWords = arrayOf("cat","dog","car","beauty","phone","computer","flower","animal")
+    private val keyWords = arrayOf("backgrounds","fashion","nature","science",
+        "education","feelings","health","people",
+        "religion","places","animals","industry",
+        "computer","food","sports","transportation",
+        "travel","buildings","business","music")
+    private var num:Int= Random.nextInt(0, 20)
     //使用单例方式创建的Retrofit对象
     private val service=getInstance()!!. create(defaultRequest::class.java)
     //内部对象存放的数据，不可被外部访问，但可以在内部进行修改
@@ -38,7 +44,7 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
             thread {
                 Log.d(TAG, "GalleryViewModel Constructor is going ")
                 //从上面随机选取标签进行网络请求
-                service.getPicture(keyWords.random(),100).enqueue(object :Callback<Pixabay>{
+                service.getPicture(getURL(),100).enqueue(object :Callback<Pixabay>{
                     override fun onResponse(call: Call<Pixabay>, response: Response<Pixabay>) {
                         if (response.body()==null){
                             Log.d(TAG, "GalleryViewModel Constructor onResponse: response is null")
@@ -48,7 +54,6 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
                         }else{
                             //由于MutableLiveData类型并不是线程安全的类型，所以这里在非UI线程中进行网络请求后就需要使用postValue对数据进行修改
                             _photoListLiveData.postValue(response.body()!!.hits.toList())
-                            Log.d(TAG, "onResponse: ${keyWords.random()}")
                             Log.d(TAG, "GalleryViewModel Constructor onResponse: Success! Response is ${response.body()!!.hits.toList()}")
                         }
                     }
@@ -66,7 +71,8 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
         Log.d(TAG, "refreshPhoto: refresh is going")
         thread {
             //操作内容基本同上
-            service.getPicture(keyWords.random(),100).enqueue(object :Callback<Pixabay>{
+            //getURL()->key
+            service.getPicture(getURL(),100).enqueue(object :Callback<Pixabay>{
                 override fun onResponse(call: Call<Pixabay>, response: Response<Pixabay>) {
                     if (response.body()==null){
                         Log.d(TAG, "onResponse: response is null")
@@ -85,4 +91,14 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
             })
         }
     }
+
+    private fun getURL():String{
+        var temple=keyWords[num]
+        num += 1
+        if (num==20){
+            num=0
+        }
+        return temple
+    }
+
 }

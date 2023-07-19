@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation"
     app:startDestination="@id/galleryFragment">
+
     <fragment
         android:id="@+id/galleryFragment"
         android:name="com.example.gallery.fragment.GalleryFragment"
@@ -16,11 +17,13 @@
             android:id="@+id/action_galleryFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/photoFragment"
         android:name="com.example.gallery.fragment.PhotoFragment"
         android:label="photo"
         tools:layout="@layout/fragment_photo" />
+
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.example.gallery.fragment.SearchFragment"
@@ -30,13 +33,15 @@
             android:id="@+id/action_searchFragment_to_resultFragment"
             app:destination="@id/resultFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/resultFragment"
         android:name="com.example.gallery.fragment.ResultFragment"
         android:label="result"
         tools:layout="@layout/fragment_result" >
         <action
-            android:id="@+id/action_resultFragment_to_photoFragment"
+            android:id="@+id/action_resultFragment_to_photoFragment2"
             app:destination="@id/photoFragment" />
     </fragment>
+
 </navigation>
