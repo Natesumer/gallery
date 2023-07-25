@@ -6,7 +6,7 @@ import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.gallery.Singleton.Companion.getInstance
+import com.example.gallery.RetrofitSingleton.Companion.getRetrofit
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -27,11 +27,11 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
         "travel","buildings","business","music")
     private var num:Int= Random.nextInt(0, 20)
     //使用单例方式创建的Retrofit对象
-    private val service=getInstance()!!. create(defaultRequest::class.java)
+    private val service= getRetrofit(). create(DefaultRequest::class.java)
     //内部对象存放的数据，不可被外部访问，但可以在内部进行修改
-    private var _photoListLiveData=MutableLiveData<List<Photo>>()
+    private var _photoListLiveData=MutableLiveData<List<Pixbay>>()
     //对外开放的数据，只能被外部访问，不能被外部修改
-    val photoListLiveData:LiveData<List<Photo>>
+    val photoListLiveData:LiveData<List<Pixbay>>
         get() =_photoListLiveData
     //这样写的好处是我们不能对photoListLiveData进行赋值，只能重新进行读取
 
@@ -93,7 +93,7 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private fun getURL():String{
-        var temple=keyWords[num]
+        val temple=keyWords[num]
         num += 1
         if (num==20){
             num=0

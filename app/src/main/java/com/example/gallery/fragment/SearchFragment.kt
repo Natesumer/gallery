@@ -1,5 +1,6 @@
 package com.example.gallery.fragment
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -10,14 +11,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.Navigation
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.gallery.R
-import com.example.gallery.modul.SearchViewModel
-import kotlin.concurrent.thread
+import com.example.gallery.modul.HistoryViewModel
+import com.example.gallery.modul.entity.History
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -33,10 +32,12 @@ class SearchFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-    private val TAG:String="zxr"
+    private val TAG:String="lkj"
 
+    private lateinit var historyViewModel: HistoryViewModel
     private lateinit var searchView: SearchView
     private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: HistoryAdapter
     private lateinit var textView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,29 +53,57 @@ class SearchFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-
-
         return inflater.inflate(R.layout.fragment_search, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        historyViewModel=ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory(requireActivity().application))[HistoryViewModel::class.java]
         searchView=view.findViewById(R.id.searchView)
         recyclerView=view.findViewById(R.id.history_recyclerView)
-        textView=view.findViewById(R.id.history_list)
+        textView=view.findViewById(R.id.delete_history)
+
+        val layoutManager=LinearLayoutManager(view.context)
+        recyclerView.layoutManager=layoutManager
+
+
+        historyViewModel.get().observe(viewLifecycleOwner){
+            adapter= HistoryAdapter(it)
+            adapter.setItemClickListener(object : HistoryAdapter.OnItemLongClickListener {
+                override fun onItemLongClick(position: Int) {
+
+                    AlertDialog.Builder(context).apply {
+                        setTitle("tip:")
+                        setMessage("\t\tDo you want to delete this record?")
+                        setCancelable(false)
+                        setPositiveButton("Yes"){ dialog, which ->
+                            val s= historyViewModel.get().value!![position].id
+                            Log.d(TAG, "onItemLongClick: id is $s")
+                            val history=History(id =s,"")
+                            historyViewModel.deleteOneHistory(history)
+                        }
+                        setNegativeButton("Cancel"){ dialog, which ->
+
+                        }
+                        show()
+                    }
+                }
+            })
+            recyclerView.adapter=adapter
+        }
 
         searchView.setOnQueryTextListener(object :SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (query != null) {
-
                     val bundle=Bundle()
                     bundle.apply {
                         putString("key",query)
                         Log.d(TAG, "onQueryTextSubmit: the key is $query")
                     }
-                    Log.d(TAG, "onQueryTextSubmit: ${Thread.currentThread()} ")
-
                     if(  findNavController().currentDestination?.id == R.id.searchFragment){
+                        val history=History(record = query)
+                        historyViewModel.insertHistory(history)
+                        historyViewModel.deleteSame()
                         findNavController().navigate(R.id.action_searchFragment_to_resultFragment,bundle)
                     }
 
@@ -90,11 +119,12 @@ class SearchFragment : Fragment() {
             }
 
         })
+
+        textView.setOnClickListener {
+            historyViewModel.delete()
+        }
     }
 
-
-
-    //这里后面还要加，要使用room把搜索记录保存到本地
     companion object {
         /**
          * Use this factory method to create a new instance of

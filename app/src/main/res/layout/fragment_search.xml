@@ -38,7 +38,7 @@
         android:text="历史记录"
         app:layout_constraintBottom_toTopOf="@+id/history_recyclerView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.076"
+        app:layout_constraintHorizontal_bias="0.1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.859" />
@@ -50,7 +50,7 @@
         android:text="清空记录"
         app:layout_constraintBottom_toBottomOf="@+id/history_list"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.885"
+        app:layout_constraintHorizontal_bias="0.87"
         app:layout_constraintStart_toEndOf="@+id/history_list"
         app:layout_constraintTop_toTopOf="@+id/history_list"
         app:layout_constraintVertical_bias="0.0" />

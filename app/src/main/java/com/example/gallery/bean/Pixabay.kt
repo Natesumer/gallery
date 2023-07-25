@@ -1,11 +1,9 @@
 package com.example.gallery.modul
 
-import android.os.Parcelable
-
 //这是一个数据类，存放从API访问得来的数据
 data class Pixabay (
     val totalHits:Int,          //可通过 API 访问的图像数。默认情况下，API 限制为每个查询最多返回 500 张图像。
-    val hits:Array<Photo>,      //Photo代表的是一个具体的图片的类
+    val hits:Array<Pixbay>,      //Photo代表的是一个具体的图片的类
     val total: Int              //此次申请符合条件的图片总个数
 ) {
     override fun equals(other: Any?): Boolean {
@@ -30,8 +28,11 @@ data class Pixabay (
 }
 
 
-data class Photo(
+data class Pixbay(
     val webformatURL:String,    //低分辨率的url
     val id:Int,                 //图片的id
-    val largeImageURL:String    //高分辨率的url
-)
+    val largeImageURL:String,    //高分辨率的url
+    val views:Int,              //浏览数量
+    val user:String,            //发布者昵称
+    val userImageURL:String     //发布者头像
+):java.io.Serializable

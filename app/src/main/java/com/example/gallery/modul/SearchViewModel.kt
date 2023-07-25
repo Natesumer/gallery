@@ -6,7 +6,7 @@ import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.gallery.Singleton.Companion.getInstance
+import com.example.gallery.RetrofitSingleton.Companion.getRetrofit
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -17,9 +17,9 @@ class SearchViewModel(application: Application):AndroidViewModel(application) {
 
     private val TAG:String="zxr"
 
-    private val service= getInstance()!!.create(defaultRequest::class.java)
-    private var _resultList=MutableLiveData<List<Photo>>()
-    val resultList:LiveData<List<Photo>>
+    private val service= getRetrofit().create(DefaultRequest::class.java)
+    private var _resultList=MutableLiveData<List<Pixbay>>()
+    val resultList:LiveData<List<Pixbay>>
         get() = _resultList
 
     fun searchPhoto(key:String){

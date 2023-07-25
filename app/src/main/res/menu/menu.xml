@@ -13,4 +13,11 @@
         android:icon="@drawable/ic_baseline_refresh_24"
         android:title="swipe to refresh"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/my_collection"
+        android:icon="@drawable/ic_baseline_star_border_white_24"
+        android:title="into my collection"
+        app:showAsAction="always"
+        />
 </menu>

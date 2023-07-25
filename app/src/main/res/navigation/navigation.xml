@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_galleryFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
+        <action
+            android:id="@+id/action_galleryFragment_to_collectionFragment"
+            app:destination="@id/collectionFragment" />
     </fragment>
 
     <fragment
@@ -41,6 +44,15 @@
         tools:layout="@layout/fragment_result" >
         <action
             android:id="@+id/action_resultFragment_to_photoFragment2"
+            app:destination="@id/photoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/collectionFragment"
+        android:name="com.example.gallery.fragment.CollectionFragment"
+        android:label="myCollection"
+        tools:layout="@layout/fragment_collection">
+        <action
+            android:id="@+id/action_collectionFragment_to_photoFragment"
             app:destination="@id/photoFragment" />
     </fragment>
 

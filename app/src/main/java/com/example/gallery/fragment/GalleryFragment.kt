@@ -113,6 +113,10 @@ class GalleryFragment : Fragment() {
                         findNavController().navigate(R.id.action_galleryFragment_to_searchFragment)
                         true
                     }
+                    R.id.my_collection->{
+                        findNavController().navigate(R.id.action_galleryFragment_to_collectionFragment)
+                        true
+                    }
                     else->false
                 }
             }

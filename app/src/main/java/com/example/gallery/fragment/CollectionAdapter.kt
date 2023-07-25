@@ -14,33 +14,25 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.example.gallery.R
-import com.example.gallery.modul.Pixbay
+import com.example.gallery.modul.entity.Collection
 import io.supercharge.shimmerlayout.ShimmerLayout
 
-//这是recyclerView的适配器
-//里面内容比较多，包含：占位控件shimmerLayout、Glide图片加载、fragment的导航及数据传递
-class GalleryAdapter(private val photoList:List<Pixbay>) :
-    RecyclerView.Adapter<GalleryAdapter.ViewHolder>(){
+class CollectionAdapter (private val collectionList:List<Collection>):
+RecyclerView.Adapter<CollectionAdapter.ViewHolder>(){
 
-    //这里有一个成员变量在构造方法当中用作为recyclerView的数据源头
-    //定义一个内部类，用来存放每个cell中的控件
-    inner class ViewHolder(view:View):RecyclerView.ViewHolder(view){
+    inner class ViewHolder(view: View):RecyclerView.ViewHolder(view){
         //这两个注释的控件不进行视图的绑定是因为在glide最后into的时候自动为我进行绑定过了
 //        val photoImage:ImageView=view.findViewById(R.id.imageView)
-        val photoViews:TextView=view.findViewById(R.id.photoViews)
-//        val userPhoto:ImageView=view.findViewById(R.id.user_imageView)
-        val userName:TextView=view.findViewById(R.id.user_name)
+        val photoViews: TextView =view.findViewById(R.id.photoViews)
+        //        val userPhoto:ImageView=view.findViewById(R.id.user_imageView)
+        val userName: TextView =view.findViewById(R.id.user_name)
     }
 
-    //经典的三大方法重写
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        //这个ViewHolder的内容几乎没啥变化
-        val view=LayoutInflater.from(parent.context)
+        val view= LayoutInflater.from(parent.context)
             .inflate(R.layout.gallery_cell,parent,false)
-        return ViewHolder(view)
-    }
+        return ViewHolder(view)    }
 
-    //重要的逻辑交互基本都在这个方法当中
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         //先获得shimmerLayout的实例，然后对其属性进行设置
         holder.itemView.findViewById<ShimmerLayout>(R.id.shimmerGellLayout).apply {
@@ -52,14 +44,14 @@ class GalleryAdapter(private val photoList:List<Pixbay>) :
             startShimmerAnimation()
         }
         //拿到此时该图片的数据
-        val photo=photoList[position]
+        val photo=collectionList[position]
         //使用Glide放置图片
         Glide.with(holder.itemView)
             .load(photo.webformatURL)
             //设置占位图片
             .placeholder(R.drawable.ic_grayphoto_24)
             //设置一个监听器，用于监测是否放置成功
-            .listener(object :RequestListener<Drawable>{
+            .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
                     e: GlideException?,
                     model: Any?,
@@ -101,15 +93,16 @@ class GalleryAdapter(private val photoList:List<Pixbay>) :
         holder.itemView.setOnClickListener {
             //由于我们是采用Navigation的方式从一个fragment转跳到另外一个fragment当中去
             //这里数据的传输我们采用的是bundle的方式
-            val bundle=Bundle()
+            val bundle= Bundle()
             bundle.apply {
-                putSerializable("photo",photo)
+                putString("largeImageURL",photo.largeImageURL)
+                putInt("id",photo.id)
                 //转跳到图片详情的页面
-                holder.itemView.findNavController().navigate(R.id.action_galleryFragment_to_photoFragment,bundle)
+                holder.itemView.findNavController().navigate(R.id.action_collectionFragment_to_photoFragment,bundle)
             }
         }
     }
 
-    override fun getItemCount()=photoList.size
+    override fun getItemCount()=collectionList.size
 
 }

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -14,15 +15,18 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.example.gallery.R
-import com.example.gallery.modul.Photo
+import com.example.gallery.modul.Pixbay
 import io.supercharge.shimmerlayout.ShimmerLayout
 
 
-class SearchAdapter(private val photoList: List<Photo>):
+class SearchAdapter(private val photoList: List<Pixbay>):
     RecyclerView.Adapter<SearchAdapter.ViewHold>() {
 
     inner class ViewHold(view: View):RecyclerView.ViewHolder(view){
         val photoImage:ImageView=view.findViewById(R.id.imageView)
+        val photoViews: TextView =view.findViewById(R.id.photoViews)
+        val userPhoto:ImageView=view.findViewById(R.id.user_imageView)
+        val userName: TextView =view.findViewById(R.id.user_name)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHold {
@@ -79,12 +83,19 @@ class SearchAdapter(private val photoList: List<Photo>):
             //加载到的控件的
             .into(holder.itemView.findViewById(R.id.imageView))
 
+        holder.userName.text=photo.user
+        holder.photoViews.text= photo.views.toString()
+        Glide.with(holder.itemView)
+            .load(photo.userImageURL)
+            .placeholder(R.drawable.ic_grayphoto_24)
+            .into(holder.itemView.findViewById(R.id.user_imageView))
+
         holder.itemView.setOnClickListener {
             //由于我们是采用Navigation的方式从一个fragment转跳到另外一个fragment当中去
             //这里数据的传输我们采用的是bundle的方式
-            val bundle= Bundle()
+            val bundle=Bundle()
             bundle.apply {
-                putString("largeImageURL",photo.largeImageURL)
+                putSerializable("photo",photo)
                 //转跳到图片详情的页面
                 holder.itemView.findNavController().navigate(R.id.action_resultFragment_to_photoFragment2,bundle)
             }
