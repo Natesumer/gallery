@@ -1,41 +1,109 @@
 package com.example.gallery.fragment
 
+import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.example.gallery.R
+import com.example.gallery.modul.DATA_STATUS_CAN_LOAD_MORE
+import com.example.gallery.modul.DATA_STATUS_NETWORK_ERROR
+import com.example.gallery.modul.DATA_STATUS_NO_MORE
 import com.example.gallery.modul.Pixbay
 import io.supercharge.shimmerlayout.ShimmerLayout
 
 
-class SearchAdapter(private val photoList: List<Pixbay>):
+class SearchAdapter(private val photoList: List<Pixbay>,
+                    private val onItemClickListener: OnItemClickListener
+):
     RecyclerView.Adapter<SearchAdapter.ViewHold>() {
 
+    companion object {
+        const val NORMAL_VIEW_TYPE = 0
+        const val FOOTER_VIEW_TYPE = 1
+    }
+
+    interface OnItemClickListener {
+        fun onItemClick(position: Int)
+    }
+
+    var footerViewStatus = DATA_STATUS_CAN_LOAD_MORE
+
     inner class ViewHold(view: View):RecyclerView.ViewHolder(view){
-        val photoImage:ImageView=view.findViewById(R.id.imageView)
         val photoViews: TextView =view.findViewById(R.id.photoViews)
-        val userPhoto:ImageView=view.findViewById(R.id.user_imageView)
         val userName: TextView =view.findViewById(R.id.user_name)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHold {
-        val view= LayoutInflater.from(parent.context)
-            .inflate(R.layout.gallery_cell,parent,false)
-        return ViewHold(view)
+    override fun getItemViewType(position: Int): Int {
+        return if (position == itemCount - 1) GalleryAdapter.FOOTER_VIEW_TYPE else GalleryAdapter.NORMAL_VIEW_TYPE
     }
 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHold {
+        val holder: ViewHold
+        if (viewType == GalleryAdapter.NORMAL_VIEW_TYPE) {
+            //这个ViewHolder的内容几乎没啥变化
+            holder = ViewHold(
+                LayoutInflater.from(parent.context)
+                    .inflate(R.layout.gallery_cell, parent, false)
+            )
+        } else {
+            holder = ViewHold(LayoutInflater.from(parent.context)
+                .inflate(R.layout.gallery_footer, parent, false).also {
+                    (it.layoutParams as StaggeredGridLayoutManager.LayoutParams).isFullSpan = true
+
+                })
+        }
+        return holder
+    }
+
+
+
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHold, position: Int) {
+        if (position == itemCount - 1) {
+
+
+            with(holder.itemView) {
+                val progressBar = findViewById<ProgressBar>(R.id.progressBar)
+                val textView = findViewById<TextView>(R.id.photoViews)
+                setOnClickListener {
+                    progressBar.visibility = View.VISIBLE
+                    textView.text = "正在加载"
+                    onItemClickListener.onItemClick(position)
+                }
+                when (footerViewStatus) {
+                    DATA_STATUS_CAN_LOAD_MORE -> {
+                        progressBar.visibility = View.VISIBLE
+                        textView.text = "正在加载"
+                        isClickable=false
+                    }
+                    DATA_STATUS_NO_MORE -> {
+                        progressBar.visibility = View.GONE
+                        textView.text = "全部加载完毕"
+                        isClickable=false
+                    }
+                    DATA_STATUS_NETWORK_ERROR -> {
+                        progressBar.visibility = View.GONE
+                        textView.text = "网络故障，点击重试"
+                        isClickable=true
+                    }
+                }
+            }
+            return
+        }
+
         //先获得shimmerLayout的实例，然后对其属性进行设置
         holder.itemView.findViewById<ShimmerLayout>(R.id.shimmerGellLayout).apply {
             //设置占位图片的颜色
@@ -84,7 +152,7 @@ class SearchAdapter(private val photoList: List<Pixbay>):
             .into(holder.itemView.findViewById(R.id.imageView))
 
         holder.userName.text=photo.user
-        holder.photoViews.text= photo.views.toString()
+        holder.photoViews.text= ((photo.views)/10000).toString()+"W"
         Glide.with(holder.itemView)
             .load(photo.userImageURL)
             .placeholder(R.drawable.ic_grayphoto_24)
@@ -102,5 +170,5 @@ class SearchAdapter(private val photoList: List<Pixbay>):
         }
     }
 
-    override fun getItemCount()=photoList.size
+    override fun getItemCount()=photoList.size+1
 }

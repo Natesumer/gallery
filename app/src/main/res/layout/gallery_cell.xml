@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp">
+    android:layout_margin="4dp"
+    app:cardCornerRadius="5dp">
 
 
 
@@ -38,21 +39,20 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.02"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.476" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/user_name"
-                    android:layout_width="100dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
                     android:maxLines="1"
-                    android:textSize="12sp"
+                    android:textSize="10sp"
                     app:layout_constraintBottom_toBottomOf="@+id/user_imageView"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.03"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline4"
                     app:layout_constraintStart_toEndOf="@+id/user_imageView"
                     app:layout_constraintTop_toTopOf="@+id/user_imageView"
-                    app:layout_constraintVertical_bias="0.47000003" />
+                    tools:ignore="SmallSp" />
 
                 <ImageView
                     android:id="@+id/photo_image"
@@ -60,23 +60,30 @@
                     android:layout_height="24dp"
                     app:layout_constraintBottom_toBottomOf="@+id/user_name"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.15"
+                    app:layout_constraintHorizontal_bias="0.46"
                     app:layout_constraintStart_toEndOf="@+id/user_name"
                     app:layout_constraintTop_toTopOf="@+id/user_name"
-                    app:layout_constraintVertical_bias="0.47000003"
                     app:srcCompat="@drawable/ic_baseline_remove_red_eye_24" />
 
                 <TextView
                     android:id="@+id/photoViews"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
+                    android:layout_marginStart="2dp"
+                    android:textSize="10sp"
                     app:layout_constraintBottom_toBottomOf="@+id/photo_image"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintHorizontal_bias="0.43"
                     app:layout_constraintStart_toEndOf="@+id/photo_image"
                     app:layout_constraintTop_toTopOf="@+id/photo_image"
-                    app:layout_constraintVertical_bias="0.47000003" />
+                    tools:ignore="SmallSp" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.5" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
 

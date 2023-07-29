@@ -1,5 +1,6 @@
 package com.example.gallery.fragment
 
+import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -33,6 +34,7 @@ RecyclerView.Adapter<CollectionAdapter.ViewHolder>(){
             .inflate(R.layout.gallery_cell,parent,false)
         return ViewHolder(view)    }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         //先获得shimmerLayout的实例，然后对其属性进行设置
         holder.itemView.findViewById<ShimmerLayout>(R.id.shimmerGellLayout).apply {
@@ -60,7 +62,7 @@ RecyclerView.Adapter<CollectionAdapter.ViewHolder>(){
                 ): Boolean {
                     return false
                 }
-                //无论是否放置成功监听器的值必须返回false，return图片就加载不出来了
+                //无论是否放置成功监听器的值必须返回false，return true图片就加载不出来了
                 override fun onResourceReady(
                     resource: Drawable?,
                     model: Any?,
@@ -82,7 +84,7 @@ RecyclerView.Adapter<CollectionAdapter.ViewHolder>(){
             .into(holder.itemView.findViewById(R.id.imageView))
 
         holder.userName.text=photo.user
-        holder.photoViews.text= photo.views.toString()
+        holder.photoViews.text= ((photo.views)/10000).toString()+"W"
         Glide.with(holder.itemView)
             .load(photo.userImageURL)
             .placeholder(R.drawable.ic_grayphoto_24)

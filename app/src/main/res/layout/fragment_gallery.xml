@@ -1,14 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/swipeLayoutGallery"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    tools:context=".fragment.GalleryFragment" >
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+<FrameLayout
+
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/swipeLayoutGallery"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        tools:context=".fragment.GalleryFragment" >
 
-</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+
+        android:id="@+id/floating_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="30dp"
+        android:clickable="true"
+        android:contentDescription="@string/floatingActionButtonContentDescription"
+        android:focusable="true"
+        android:src="@drawable/ic_baseline_keyboard_double_arrow_up_24"
+        app:tint="@color/white"
+        app:backgroundTint="@color/purple_500"
+        app:elevation="8dp"/>
+
+</FrameLayout>

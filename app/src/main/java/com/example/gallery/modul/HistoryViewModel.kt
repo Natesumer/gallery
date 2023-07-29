@@ -14,6 +14,7 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
 
     fun get()=historyRepository.getAllHistoryLive()
 
+
     fun insertHistory(history: History){
         historyRepository.insert(history)
     }

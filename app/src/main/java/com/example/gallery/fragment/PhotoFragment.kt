@@ -1,5 +1,6 @@
 package com.example.gallery.fragment
 
+import android.app.AlertDialog
 import android.content.ContentValues
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -21,6 +22,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -30,7 +32,6 @@ import com.example.gallery.R
 import com.example.gallery.RetrofitSingleton
 import com.example.gallery.modul.CollectionViewModel
 import com.example.gallery.modul.DefaultRequest
-import com.example.gallery.modul.Pixabay
 import com.example.gallery.modul.Pixbay
 import io.supercharge.shimmerlayout.ShimmerLayout
 import okhttp3.ResponseBody
@@ -68,6 +69,8 @@ class PhotoFragment : Fragment() {
     private val handler=Handler(Looper.getMainLooper())
     private var id: Int? = null
     private var photo: Pixbay? = null
+    //这个标志用来表示当前图片是否处于被收藏状态
+    private var collectionFlag:Boolean?=false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -104,6 +107,8 @@ class PhotoFragment : Fragment() {
         //如果"photo"的value为null说明他是从CollectionFragment转跳过来的
         if (photo == null) {
             URL = requireArguments().getString("largeImageURL")!!
+            //将状态改为收藏状态，并且切换图片
+            collectionFlag=true
             collection.setImageResource(R.drawable.ic_baseline_star_24)
             id = requireArguments().getInt("id")
         } else {
@@ -126,39 +131,10 @@ class PhotoFragment : Fragment() {
                     "android.permission.WRITE_EXTERNAL_STORAGE"
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
+                //申请本地文件写入的权限权限
                 startLocationPermissionRequest()
             } else {
                 savePhoto()
-            }
-
-        }
-
-        collection.setOnClickListener {
-
-            //如果photo不为null，说明我们是从GalleryFragment或者ResultFragment转跳过来的
-            //在这里我们点击收藏就会导致将其保存数据到本地
-            if (photo != null) {
-                val c = Collection(
-                    id = photo!!.id,
-                    webformatURL = photo!!.webformatURL,
-                    largeImageURL = photo!!.largeImageURL,
-                    views = photo!!.views,
-                    user = photo!!.user,
-                    userImageURL = photo!!.userImageURL
-                )
-                Log.d("xxx", "onCreateView: ${photo!!.id}")
-                //数据保存
-                collectionViewModel.insertCollection(c)
-                collectionViewModel.deleteSame()
-                //切换成已收藏的图标
-                collection.setImageResource(R.drawable.ic_baseline_star_24)
-            } else {
-                //如果photo为null，说明我们是从CollectionFragment转跳过来的
-                //此时，点击收藏的意思是取消收藏
-                //所以我们将其移出数据库
-                collectionViewModel.delete(Collection(id = id!!, "", "", 0, "", ""))
-                //并将图片切换回未收藏的状态
-                collection.setImageResource(R.drawable.ic_baseline_star_border_24)
             }
 
         }
@@ -189,6 +165,70 @@ class PhotoFragment : Fragment() {
                 }
             })
             .into(photoView)
+
+        collection.setOnClickListener {
+
+
+            //如果photo不为null，说明我们是从GalleryFragment或者ResultFragment转跳过来的
+            //在这里我们点击收藏就会导致将其保存数据到本地
+            if (photo != null) {
+
+                if (collectionFlag==true){
+                    //再次点击了收藏图标
+                    //意思是取消之前的收藏
+                    collectionViewModel.delete(Collection(id = id!!, "", "", 0, "", ""))
+                    collectionFlag=false
+                    collection.setImageResource(R.drawable.ic_baseline_star_border_24)
+
+                }else{
+                    val c = Collection(
+                        id = photo!!.id,
+                        webformatURL = photo!!.webformatURL,
+                        largeImageURL = photo!!.largeImageURL,
+                        views = photo!!.views,
+                        user = photo!!.user,
+                        userImageURL = photo!!.userImageURL
+                    )
+                    Log.d("xxx", "onCreateView: ${photo!!.id}")
+                    //数据保存
+                    collectionViewModel.insertCollection(c)
+                    collectionViewModel.deleteSame()
+                    collectionFlag=true
+                    //切换成已收藏的图标
+                    collection.setImageResource(R.drawable.ic_baseline_star_24)
+                }
+
+            } else {
+
+                if (collectionFlag==true){
+
+                    //警告框弹出
+                    AlertDialog.Builder(context).apply {
+                        setTitle("tip:")
+                        setMessage("\t\tDo you want to unbookmark this image?")
+                        setCancelable(false)
+                        setPositiveButton("Yes"){ dialog, which ->
+                            //如果photo为null，说明我们是从CollectionFragment转跳过来的
+                            //此时，点击收藏的意思是取消收藏
+                            //所以我们将其移出数据库
+                            collectionViewModel.delete(Collection(id = id!!, "", "", 0, "", ""))
+                            //并将图片切换回未收藏的状态
+                            collectionFlag=false
+                            collection.setImageResource(R.drawable.ic_baseline_star_border_24)
+                            findNavController().navigateUp()
+                        }
+                        setNegativeButton("Cancel"){ dialog, which ->
+
+                        }
+                        show()
+                    }
+
+                }
+            }
+
+        }
+
+
         return view
     }
 
@@ -272,7 +312,17 @@ class PhotoFragment : Fragment() {
         }
     }
 
+    // Ex. android.permission.WRITE_EXTERNAL_STORAGE.
+    private fun startLocationPermissionRequest() {
+        //launch方法用于启动权限请求，并将权限请求的结果作为回调传递给注册的ActivityResultCallback。
+        //launch方法用触发权限请求，并将权限请求的结果递给回调函数进行处理。
+        requestPermissionLauncher.launch("android.permission.WRITE_EXTERNAL_STORAGE")
+    }
 
+    //registerForActivityResult方法用于注册一个用于处理活动结果的回调函数在这种情况下，
+    //我们使用ActivityResultContracts.RequestPermission()作为活动结果合同，
+    //该合同负责处理权限请求的结果。
+    //当权限请求完成时，ActivityResultCallback会调用，并将权限是否被授的信息传递给回调函数中的isGranted参数。
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -288,12 +338,6 @@ class PhotoFragment : Fragment() {
             ).show()
         }
     }
-
-    // Ex. android.permission.WRITE_EXTERNAL_STORAGE.
-    private fun startLocationPermissionRequest() {
-        requestPermissionLauncher.launch("android.permission.WRITE_EXTERNAL_STORAGE")
-    }
-
 
     companion object {
         /**

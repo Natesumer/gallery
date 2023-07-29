@@ -28,11 +28,11 @@ private const val ARG_PARAM2 = "param2"
  * Use the [SearchFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class SearchFragment : Fragment() {
+class SearchFragment : Fragment(), HistoryAdapter.OnItemLongClickListener {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-    private val TAG:String="lkj"
+    private val TAG: String = "lkj"
 
     private lateinit var historyViewModel: HistoryViewModel
     private lateinit var searchView: SearchView
@@ -58,58 +58,47 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        historyViewModel=ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory(requireActivity().application))[HistoryViewModel::class.java]
-        searchView=view.findViewById(R.id.searchView)
-        recyclerView=view.findViewById(R.id.history_recyclerView)
-        textView=view.findViewById(R.id.delete_history)
+        historyViewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.AndroidViewModelFactory(requireActivity().application)
+        )[HistoryViewModel::class.java]
+        searchView = view.findViewById(R.id.searchView)
+        recyclerView = view.findViewById(R.id.history_recyclerView)
+        textView = view.findViewById(R.id.delete_history)
 
-        val layoutManager=LinearLayoutManager(view.context)
-        recyclerView.layoutManager=layoutManager
+        val layoutManager = LinearLayoutManager(view.context)
+        recyclerView.layoutManager = layoutManager
 
 
-        historyViewModel.get().observe(viewLifecycleOwner){
-            adapter= HistoryAdapter(it)
-            adapter.setItemClickListener(object : HistoryAdapter.OnItemLongClickListener {
-                override fun onItemLongClick(position: Int) {
-
-                    AlertDialog.Builder(context).apply {
-                        setTitle("tip:")
-                        setMessage("\t\tDo you want to delete this record?")
-                        setCancelable(false)
-                        setPositiveButton("Yes"){ dialog, which ->
-                            val s= historyViewModel.get().value!![position].id
-                            Log.d(TAG, "onItemLongClick: id is $s")
-                            val history=History(id =s,"")
-                            historyViewModel.deleteOneHistory(history)
-                        }
-                        setNegativeButton("Cancel"){ dialog, which ->
-
-                        }
-                        show()
-                    }
-                }
-            })
-            recyclerView.adapter=adapter
+        historyViewModel.get().observe(viewLifecycleOwner) {
+            adapter = HistoryAdapter(it, this)
+            recyclerView.adapter = adapter
         }
 
-        searchView.setOnQueryTextListener(object :SearchView.OnQueryTextListener{
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (query != null) {
-                    val bundle=Bundle()
+                    val bundle = Bundle()
                     bundle.apply {
-                        putString("key",query)
+                        putString("key", query)
                         Log.d(TAG, "onQueryTextSubmit: the key is $query")
                     }
-                    if(  findNavController().currentDestination?.id == R.id.searchFragment){
-                        val history=History(record = query)
+                    if (findNavController().currentDestination?.id == R.id.searchFragment) {
+                        val history = History(record = query)
                         historyViewModel.insertHistory(history)
                         historyViewModel.deleteSame()
-                        findNavController().navigate(R.id.action_searchFragment_to_resultFragment,bundle)
+                        findNavController().navigate(
+                            R.id.action_searchFragment_to_resultFragment,
+                            bundle
+                        )
                     }
 
-                }
-                else {
-                    Toast.makeText(requireContext(),"please enter the right key",Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "please enter the right key",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
                 return true
             }
@@ -124,6 +113,27 @@ class SearchFragment : Fragment() {
             historyViewModel.delete()
         }
     }
+
+    //删除长按监听事件
+    override fun onItemLongClick(position: Int) {
+        //警告框弹出
+        AlertDialog.Builder(context).apply {
+            setTitle("tip:")
+            setMessage("\t\tDo you want to delete this record?")
+            setCancelable(false)
+            setPositiveButton("Yes") { dialog, which ->
+                val s = historyViewModel.get().value!![position].id
+                Log.d(TAG, "onItemLongClick: id is $s")
+                val history = History(id = s, "")
+                historyViewModel.deleteOneHistory(history)
+            }
+            setNegativeButton("Cancel") { dialog, which ->
+
+            }
+            show()
+        }
+    }
+
 
     companion object {
         /**
